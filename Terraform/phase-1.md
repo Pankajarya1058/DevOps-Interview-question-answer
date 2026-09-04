@@ -136,6 +136,35 @@ It initialize the project.
 9. terraform apply applies those changes.
 10. terraform destroy removes Terraform-managed resources.
 
+## First Terraform Code
+```bash
+# Create main.tf file
+
+terraform-demo/
+└── main.tf
+```
+```bash
+# main.tf
+
+terraform {                        # terraform block
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+  }
+}
+
+provider "aws" {                  # provider block
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "web" {  # resource block
+  ami           = "YOUR_AMI_ID"
+  instance_type = "t2.micro"
+}
+```
+
 ## Interview Questions
 #### Q1. What is Terraform?
 #### Q2. What is Infrastructure as Code?
