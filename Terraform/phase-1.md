@@ -124,6 +124,45 @@ It initialize the project.
 - **Provider:** Which platform should I communicate with?
 - **Resource:** What needs to be created or managed on that platform?
 
+## Terraform block vs Provider block
+- **Terraform block**
+  - Its job is to tell the configuration or project requirements to Terraform.
+  - Means, My project needs an AWS provider, which will come from HashiCorp and I need a compatible version.
+  - Here you can specify, Required providers, Provider version, Provider source, Terraform version, Backend.
+    ```bash
+    terraform {
+      required_version = ">= 1.5.0"
+
+      required_providers {
+        aws = {
+          source  = "hashicorp/aws"
+          version = "~> 6.0"
+        }
+      }
+    }
+    ```
+    
+- **Provider block**
+  - The function of the provider block is to configure the provider.
+  - Here we are saying, Use AWS as the provider and work in the AWS ap-south-1 region.
+  - Provider block generally contains provider-specific configuration. And credentials can normally be provided via environment variables, AWS CLI/profiles, IAM roles, or OIDC sets.
+    ```bash
+    provider "aws" {
+      region = "ap-south-1"
+    }
+    ```
+---
+
+> **Important:**
+> 
+> What happens when we run terraform init
+> 
+> Terraform looks at the Terraform block and download the provider.
+>
+> **Provider block** does not download the provider. It provides the provider's configuration.
+---
+
+
 ## Revision
 1. Terraform is an IaC tool by HashiCorp.
 2. IaC means managing infrastructure through code.
@@ -155,11 +194,11 @@ terraform {                        # terraform block
   }
 }
 
-provider "aws" {                  # provider block
+provider "aws" {                   # provider block
   region = "ap-south-1"
 }
 
-resource "aws_instance" "web" {  # resource block
+resource "aws_instance" "web" {    # resource block
   ami           = "YOUR_AMI_ID"
   instance_type = "t2.micro"
 }
@@ -184,4 +223,6 @@ resource "aws_instance" "web" {  # resource block
 #### Q16. Why is Terraform called declarative?
 #### Q17. How does Terraform communicate with AWS?
 #### Q18. What are the major components of Terraform architecture?
+#### Q19. Can Terraform work without a terraform block?
+#### Q20. Difference between Terraform block and Provider block?
 
