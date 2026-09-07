@@ -113,3 +113,29 @@ EC2, ECS, and EKS are used for different purpose.
 - Finally, browser response can be received by HTML, CSS, Javascript etc. which processes and displays the web page on the screen.
 
   > **Simple flow:** URL → DNS → IP → TCP → TLS → HTTP Request → Server Response → Browser renders page.
+
+
+### What is the difference between HTTP and HTTPS? How does HTTPS provide security?
+- HTTP and HTTPS are both protocols for web communication.
+- HTTP normally used port 80 and data can be sent in plain text, so it is not secure.
+- HTTP normally used port 443 and uses TLS to secure the communication.
+- When a browser accesses an HTTPS website. the server provides the TLS certificate. The browser validates the certificate, including the trusted CA, expiry, and domain name.
+- After that, a secure connection is established and data travels in encrypted form.
+- So in simple words, HTTPS provides encryption, server authentication, and data integrity.
+
+### What is Docker, and what is the difference between a Docker image and a Docker container?
+- Docker is an open-source containerization platform used to run applications within containers, along with their dependencies and required configurations.
+- A Docker image is a blueprint or template; it contains the application, required libraries, dependencies, and configuration.
+- A Docker container is a running instance of that image.
+- For example, if I have an Nginx Docker image, running that image causes Docker to create a container from it.
+
+### What is a Dockerfile? Explain the common instructions used in a Dockerfile, such as FROM, RUN, COPY, WORKDIR, EXPOSE, and CMD.
+- A Dockerfile is a plain text file that defines instructions for building a Docker image.
+  
+  Common instructions include:
+  - **FROM** — specifies the base image, such as Ubuntu, Python, or Nginx.
+  - **RUN** — executes a command while building the image, such as installing a package.
+  - **COPY** — copies files from the build context into the Docker image.
+  - **WORKDIR** — sets the working directory inside the container.
+  - **EXPOSE** — indicates which port the application will listen on; it does not actually publish the port.
+  - **CMD** — defines the default command to run when the container starts.
