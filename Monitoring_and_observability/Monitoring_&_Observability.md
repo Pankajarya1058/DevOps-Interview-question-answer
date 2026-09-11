@@ -342,11 +342,57 @@ Saturation
 Errors
 ```
 
- 
-    
-         
- 
+## P50, P90, P95, P99
 
+- A percentile basically indicates: "What percentage of requests were completed within this latency?"
+
+Suppose you received 100 API requests.
+```
+Fastest                                      Slowest
+|-----------------------------------------------|
+1ms  2ms  5ms  10ms ... 100ms ... 500ms ... 5sec
+```
+
+**P50 — Median**
+- P50 = 50% of requests were completed within this latency.
+- Example: ``` P50 = 100 ms```.
+- Meaning, 50% requests 100 ms ya usse kam mein complete hui.
+- And roughly 50% 100 ms requests 100 ms se zyada le sakti hain.
+
+**P90**
+- ```P90 = 200 ms```
+- Meaning: 90% requests 200 ms ya usse kam mein complete hui.
+- Sirf 10% requests 200 ms se zyada slow thi.
+  
+**P95**
+- ```P95 = 500 ms```
+- Meaning: 95% requests 500 ms ya usse kam mein complete hui.
+- Sirf 5% requests 500 ms se zyada slow thi.
+ 
+**P99**
+- ```P99 = 2 seconds```
+- Meaning: 99% requests 2 seconds ya usse kam mein complete hui.
+- Sirf 1% requests 2 seconds se zyada slow thi.    
+         
+| Percentile | Simple meaning                   |
+| ---------- | -------------------------------- |
+| **P50**    | 50% requests this fast or faster |
+| **P90**    | 90% requests this fast or faster |
+| **P95**    | 95% requests this fast or faster |
+| **P99**    | 99% requests this fast or faster |
+
+## Why P99 is important in SRE?
+- Average latency: ```Average = 150ms```
+- Looking at average latency you can say "The application is fast"
+- But the actual picture could be:
+  ```
+  P50 = 100ms
+  P95 = 500ms
+  P99 = 5 seconds
+  ```
+- This means the majority of users find the application fast, but a small percentage are having a very poor experience. That's why in production monitoring P95/P99 are very useful.
+
+**Interview one-liner:** P99 latency means 99% of requests complete within that latency, while the slowest 1% take longer.
 
 
 
