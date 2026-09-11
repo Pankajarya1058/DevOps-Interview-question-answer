@@ -21,3 +21,85 @@
 - This is where state comes into play.
 
 ## Main purpose of State
+- Terraform maintains information about the infrastructure in the Terraform state.
+- Conceptually:
+  ```
+  Terraform Configuration
+        +
+  Terraform State
+        +
+  Real Infrastructure
+        ↓
+  Terraform determines changes
+  ```
+- Example:
+  ```
+                   Terraform
+                    |
+       +------------+------------+
+       |                         |
+   Configuration              State
+       |                         |
+       +------------+------------+
+                    ↓
+              Compare/Refresh
+                    ↓
+              Real Infrastructure
+  ```
+
+## terraform.tfstate
+- In a default local setup, the Terraform state is usually stored in the ```terraform.tfstate``` file.
+- Example project:
+  ```
+  terraform-project/
+  │
+  ├── main.tf
+  ├── variables.tf
+  ├── outputs.tf
+  └── terraform.tfstate
+  ```
+- The state file is in a format similar to JSON.
+- Example conceptually:
+  ```
+  {
+    "resources": [
+      {
+        "type": "aws_instance",
+        "name": "web"
+      }
+    ]
+  }
+  ```
+  > Note: The structure of the actual state file is quite detailed, so manual editing should be avoided.
+
+## What information does the Terraform state contain?
+- The state contains information about Terraform-managed infrastructure.
+- For Example:
+  ```
+  Resource
+   ↓
+  aws_instance.web
+   ↓
+  AWS instance ID
+   ↓
+  Attributes
+   ↓
+  Dependencies / metadata
+  ```
+- Exact contents vary according to resource/provider and terraform version.
+
+### Important: The state and infrastructure are not the same thing.
+- ``` terraform.tfstate ≠ AWS EC2```
+- The state is not AWS EC2.
+- The state has records/knowledge about the infrastructure that it manages.
+- Real infrastructure is in AWS.
+  ```
+  Terraform State
+      ↓
+  Terraform ki known information
+
+     AWS
+      ↓
+  Actual infrastructure
+  ```
+  
