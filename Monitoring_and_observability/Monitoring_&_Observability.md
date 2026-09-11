@@ -240,15 +240,107 @@ timeout=5s
 
 ## USE Method
 - This method is useful for analyzing infrastructure and resources.
+- This method is associated with Brendan Gregg and is commonly used in infrastructure performance analysis.
   ```
   U → Utilization
   S → Saturation
   E → Errors
   ```
-  U — Utilization
-  S — Saturation
-  E — Errors
-  ```
+  **U** — Utilization
+  - How busy is the resource?
+  - Example:
+    ```
+    CPU utilization = 85%
+    Disk utilization = 70%
+    ```
+
+  **S** — Saturation
+  - How much pending work does the resource have, or how close are they to their resource limit?
+  - Example:
+    ```
+    CPU run queue high
+    Disk I/O queue high
+    Thread pool exhausted
+    DB connection pool nearly full
+    ```
+  - Important: Utilization and saturation are not the same.
+  - Example:
+    ```
+    CPU utilization = 70%
+    CPU run queue = very high
+    ```
+  - CPU is 70% busy, but the request is waiting for the CPU. That's saturation.
+
+  **E** — Errors
+  - Resource-related errors.
+  - Example:
+    ```
+    Disk I/O errors
+    Network packet errors
+    NIC errors
+    Filesystem errors
+    Hardware errors
+    ```
+
+## RED vs USE
+| RED                      | USE                              |
+| ------------------------ | -------------------------------- |
+| Services ke liye         | Infrastructure/resources ke liye |
+| Rate                     | Utilization                      |
+| Errors                   | Saturation                       |
+| Duration                 | Errors                           |
+| User/request perspective | Resource perspective             |
+
+**RED** = Request/Service side
+**USE** = Underlying infrastructure side
+
+Example:
+```
+              Application
+                  |
+             RED Method
+          /      |       \
+       Rate    Errors   Duration
+                  |
+                  ↓
+            Infrastructure
+                  |
+             USE Method
+          /      |       \
+ Utilization  Saturation  Errors
+```
+    
+### Quest: How would you monitor a production service?
+- I would start with four golden signals — latency, traffic, errors, and saturation. For service-level monitoring, I would use the RED method to track request rate, errors, and duration. For infrastructure, I would use the USE method to monitor utilization, saturation, and errors. Along with metrics, I would collect logs and distributed traces so that when an alert fires, we can investigate the root cause rather than just knowing that something is wrong.
+
+```
+MONITORING
+    ↓
+Something is wrong?
+
+OBSERVABILITY
+    ↓
+Why is it wrong?
+
+GOLDEN SIGNALS
+    ↓
+Latency
+Traffic
+Errors
+Saturation
+
+RED
+    ↓
+Rate
+Errors
+Duration
+
+USE
+    ↓
+Utilization
+Saturation
+Errors
+```
 
  
     
