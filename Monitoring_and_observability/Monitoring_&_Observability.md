@@ -241,7 +241,7 @@ timeout=5s
 
 ## USE Method
 - This method is useful for analyzing infrastructure and resources.
-- This method is associated with Brendan Gregg and is commonly used in infrastructure performance analysis.
+- This method is commonly used in infrastructure performance analysis.
   ```
   U → Utilization
   S → Saturation
