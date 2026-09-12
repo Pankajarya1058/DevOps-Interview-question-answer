@@ -105,9 +105,9 @@ timeout=5s
   - Fluent Bit
   - Logstash
  
-  ### Traces
-  - A trace is the journey of a single request from start to finish as it travels through your entire system.
-  ```
+### Traces
+- A trace is the journey of a single request from start to finish as it travels through your entire system.
+```
   User Request
     |
     ├── API Gateway       20ms
@@ -117,82 +117,83 @@ timeout=5s
     ├── Payment Service   800ms
     |
     └── Database          700ms
-  ```
-  - It appears that the bottleneck could be with the payment service or on the DB side.
-  - Common tools:
-    - OpenTelemetry
-    - Jaeger
-    - Tempo
+```
+- It appears that the bottleneck could be with the payment service or on the DB side.
+- Common tools:
+  - OpenTelemetry
+  - Jaeger
+  - Tempo
 
-  ## Golden Signals
-  - The "4 Golden Signals" are commonly used in the Google SRE methodology.
-    - Latency
-    - Traffic
-    - Errors
-    - Saturation
+## Golden Signals
+- The "4 Golden Signals" are commonly used in the Google SRE methodology.
+  - Latency
+  - Traffic
+  - Errors
+  - Saturation
 
-    ### Latency
-    - How long is it taking for the request to be completed?
-    - Example: ```API response latency = 200 ms```
-    - Looking only at average latency in production is not enough.
-    - Better:
-      ```
-      P50 = 100 ms
-      P95 = 400 ms
-      P99 = 1.2 sec
-      ```
-    - Interview point: Latency should ideally be measured separately for successful and failed requests because errors can sometimes return very quickly.
-      ```
-      Successful request = 500 ms
-      Failed request     = 20 ms
-      ```
-    - If you look only at average latency, the picture can be misleading.
+  ### Latency
+  - How long is it taking for the request to be completed?
+  - Example: ```API response latency = 200 ms```
+  - Looking only at average latency in production is not enough.
+  - Better:
+    ```
+    P50 = 100 ms
+    P95 = 400 ms
+    P99 = 1.2 sec
+    ```
+  - Interview point: Latency should ideally be measured separately for successful and failed requests because errors can sometimes return very quickly.
+    ```
+    Successful request = 500 ms
+    Failed request     = 20 ms
+    ```
+  - If you look only at average latency, the picture can be misleading.
    
-    ### Traffic
-    - How much load or how many requests is the system receiving?
-    - Example: ```Request/sec = 1,000```
-    - Other Examples:
-      ```
-      HTTP requests/sec
-      Messages/sec
-      Transactions/sec
-      Active users
-      Network packets/sec
-      ```
-    - Suppose normal traffic ```1,000 req/sec```. Suddenly ```10,000 req/sec```
-    - So, The system might be overloaded.
+  ### Traffic
+  - How much load or how many requests is the system receiving?
+  - Example: ```Request/sec = 1,000```
+  - Other Examples:
+    ```
+    HTTP requests/sec
+    Messages/sec
+    Transactions/sec
+    Active users
+    Network packets/sec
+    ```
+  - Suppose normal traffic ```1,000 req/sec```. Suddenly ```10,000 req/sec```
+  - So, The system might be overloaded.
 
-    ### Errors
-    - How many requests are failing?
-    - Example:
-      ```
-      Total requests = 100,000
-      Failed requests = 2,000
+  ### Errors
+  - How many requests are failing?
+  - Example:
+    ```
+    Total requests = 100,000
+    Failed requests = 2,000
 
-      Error rate = 2%
-      ```
-    - Errors include:
-      ```
-      HTTP 5xx
-      HTTP 4xx (depending on use case)
-      Timeouts
-      Connection failures
-      Application exceptions
-      ```
-      > Important: Not every 4xx necessarily system failure. Ex: ```404 Not Found``` ERROR could be wrong URL. But ```500 Internal Server Error``` usually indicate application/server-side issue.
+    Error rate = 2%
+    ```
+  - Errors include:
+    ```
+    HTTP 5xx
+    HTTP 4xx (depending on use case)
+    Timeouts
+    Connection failures
+    Application exceptions
+    ```
+    > Important: Not every 4xx necessarily system failure. Ex: ```404 Not Found``` ERROR could be wrong URL. But ```500 Internal Server Error``` usually indicate application/server-side issue.
 
-    ### Saturation
-    - How close are the system resources to their limits OR How busy your resources are.
-    - Example:
-      CPU utilization = 95%
-      Memory = 90%
-      Disk = 95%
-      Connection pool = 98%
-      Thread pool = 95%
-      ```
-    - Saturation basically asks "System ki capacity kitni consume ho chuki hai?"
-      Example: ```DB connection pool: Maximum = 100 and current used = 98``` ```Saturation 98%```
-      - If traffic increases further, requests may delays or fail.
+  ### Saturation
+  - How close are the system resources to their limits OR How busy your resources are.
+  - Example:
+    ```
+    CPU utilization = 95%
+    Memory = 90%
+    Disk = 95%
+    Connection pool = 98%
+    Thread pool = 95%
+    ```
+  - Saturation basically asks "System ki capacity kitni consume ho chuki hai?"
+    Example: ```DB connection pool: Maximum = 100 and current used = 98``` ```Saturation 98%```
+  - If traffic increases further, requests may delays or fail.
       
 ### Golden Signals - quick summary
 | Signal         | Simple question                   | Example     |
