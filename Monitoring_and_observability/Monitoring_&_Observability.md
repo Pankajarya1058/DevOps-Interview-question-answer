@@ -293,6 +293,7 @@ timeout=5s
 | User/request perspective | Resource perspective             |
 
 **RED** = Request/Service side
+
 **USE** = Underlying infrastructure side
 
 Example:
