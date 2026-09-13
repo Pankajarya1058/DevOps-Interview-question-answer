@@ -312,7 +312,7 @@ Example:
  Utilization  Saturation  Errors
 ```
     
-### Quest: How would you monitor a production service?
+### Ques: How would you monitor a production service?
 - I would start with four golden signals — latency, traffic, errors, and saturation. For service-level monitoring, I would use the RED method to track request rate, errors, and duration. For infrastructure, I would use the USE method to monitor utilization, saturation, and errors. Along with metrics, I would collect logs and distributed traces so that when an alert fires, we can investigate the root cause rather than just knowing that something is wrong.
 
 ```
@@ -458,17 +458,249 @@ Tools like Prometheus primarily collect, store, and query these metrics.
 - Prometheus: ```node_memory_available_bytes 4294967296```
 - Gauge = abhi ki current value kya hai?
   
-
+## 3. Histogram
+- The histogram is important because it is widely used in latency monitoring.
+- A histogram divides values ​​into buckets.
+- Histogram = values ko ranges/buckets mein divide karna.
+- Suppose API latency is:
+  ```
+  50ms
+  100ms
+  150ms
+  300ms
+  700ms
+  2sec
+  ```
+- We can create buckets:
+  ```
+  ≤ 100ms
+  ≤ 500ms
+  ≤ 1sec
+  ≤ 5sec
+  ```
+- A Prometheus histogram maintains data something like this:
+  ```
+  request_duration_seconds_bucket{le="0.1"} 500
+  request_duration_seconds_bucket{le="0.5"} 900
+  request_duration_seconds_bucket{le="1"}   980
+  request_duration_seconds_bucket{le="5"}   1000
+  ```
+  Simple meaning:
+  ```
+  ≤ 100ms → 500 requests
+  ≤ 500ms → 900 requests
+  ≤ 1sec  → 980 requests
+  ≤ 5sec  → 1000 requests
+  ```
+  **Main use of Histogram.**
+  Understand Latency distribution and in Prometheus, P50, P95, and P99 values ​​can be calculated from the histogram.
+  ```
+  # This will calculate approximately P99 latency.
   
+  histogram_quantile(
+    0.99,
+    rate(http_request_duration_seconds_bucket[5m])
+  )
+  ```
+
+## 4. Summary
+- Summary is also primarily used for distributions/quantiles especially latency.
+- Example:
+  ```
+  P50 = 100ms
+  P90 = 300ms
+  P99 = 800ms
+  ```
+- Summary can calculate quantiles on the client/application side.
+
+### Histogram vs Summary
+| Histogram                                  | Summary                                         |
+| ------------------------------------------ | ----------------------------------------------- |
+| Values ko buckets mein store karta hai     | Quantiles calculate karta hai                   |
+| Server-side quantile calculation possible  | Quantile usually client-side calculate hota hai |
+| Prometheus mein aggregation ke liye better | Multiple instances mein aggregation difficult   |
+| Bucket configuration required              | Quantile configuration required                 |
+| Prometheus mein commonly preferred         | Specific use cases mein useful                  |
+
+Histogram observes values in configurable buckets and allows aggregation across instances. Summary calculates quantiles on the client side, so its quantiles are generally harder to aggregate across multiple instances.
+
+---
+
+### CPU Metric = Server ka processor kitna busy hai.
+- CPU indicates: How busy the server's processor is.
+- Example: ```CPU usage = 75%```
+- With Prometheus/node-exporter, you get raw CPU time metrics, such as: ```node_cpu_seconds_total```
+
+### Memory Metrics = RAM kitni available/used hai.
+- Memory indicates: How much RAM is available/used.
+- Example:
+  ```
+  Total RAM = 16 GB
+  Used       = 12 GB
+  Available  = 4 GB
+  ```
+- Important metrics:
+  ```
+  Total memory
+  Available memory
+  Used memory
+  Swap
+  ```
+- Prometheus/node-exporter examples:
+  ```
+  node_memory_MemTotal_bytes
+  node_memory_MemAvailable_bytes
+  node_memory_SwapFree_bytes
+  ```
+
+### Disk Metrics
+- In Disk monitoring mainly two things are important.
+
+  **1. Disk space**
+  - Example: ```Disk = 90% full```
+  - Metric:
+    ```
+    node_filesystem_avail_bytes
+    node_filesystem_size_bytes
+    ```
+  - Problem: ```Disk 100% full```
+  - Potential impact:
+    - Application logs cannot be written
+    - Database write operations may fail
+    - Application may crash
+    - System instability
+   
+  **2. Disk I/O**
+  - Disk space and disk performance are different things.
+  - Suppose: ```Disk space = 40%```
+  - But:
+    ```
+    Disk I/O = very high
+    I/O wait = high
+    ```
+  - Application can be slow. So Disk Capacity + Disk I/O both are important in monitoring.
+
+### Network Metrics
+- In network monitoring, we observe:
+  ```
+  Incoming traffic
+  Outgoing traffic
+  Packets
+  Errors
+  Dropped packets
+  Network throughput
+  ```
+- Example:
+  ```
+  Incoming = 500 Mbps
+  Outgoing = 300 Mbps
+  Packet drops = increasing
+  ```
+- If network packet drops are increasing, application connectivity or performance could be impacted.
+
+### Application Metrics
+- Infrastructure metrics: ```CPU```, ```Memory```, ```Disk````, and ```Network```
+- But for SRE, application-level metrics are also extremely important.
+- Example e-commerce application:
+  ```
+  HTTP requests
+  HTTP errors
+  Request latency
+  Active users
+  Orders created
+  Payment failures
+  Database connections
+  Queue length
+  ```
+- Example
+  ```
+  http_requests_total
+  http_request_duration_seconds
+  http_requests_errors_total
+  ```
+- Business metrics:
+  ```
+  orders_created_total
+  payments_failed_total
+  ```
+
+#### Infrastructure vs Application Metrics
+- Suppose:
+  ```
+    CPU       = 40%
+    Memory    = 50%
+    Disk      = 40%
+    Network   = normal
+  ```
+- Everything looks healthy on infrastructure level but application metrics:
+  ```
+    HTTP 500 = 10%
+    Payment failures = 8%
+    Latency P99 = 5 sec
+  ```
+- At the application side, application is unhealthy. That's why both layers are important in SRE monitoring.
+  ```
+                    Monitoring
+                        |
+              ┌─────────┴─────────┐
+              ↓                   ↓
+         Infrastructure         Application
+              |                   |
+         CPU / Memory          Request rate
+         Disk / Network        Error rate
+                               Latency
+                               Business metrics
+  ```
+
+  ---
+Suppose you have Order API:
+
+  **Counter** = Total kitne orders create hue?
+  
+  **Gauge** = Currently kitne active orders hain?
+  
+  **Histogram** = Requests ki latency kis range mein distributed hai?
+  
+  **Summary** = Request latency ke quantiles kya hain?
+
+#### Ques. What is the difference between Counter and Gauge?
+- Counter ek monotonically increasing metric hai jo kisi event ke total occurrences ko represent karta hai, jaise total HTTP requests ya errors. Ye process restart hone par reset ho sakta hai. Gauge current value represent karta hai aur increase ya decrease dono ho sakta hai, jaise CPU usage, memory usage ya active users.
+
+#### Ques. Histogram vs Summary?
+- Histogram observations ko buckets mein store karta hai aur Prometheus mein multiple instances ke data ko aggregate karke quantiles calculate kar sakte hain. Summary client side par quantiles calculate karta hai, isliye multiple instances ke across quantile aggregation difficult hoti hai. Prometheus environments mein latency monitoring ke liye histogram commonly preferred hota hai.
+
+```
+METRICS
+   |
+   ├── Counter
+   |      └── Total events
+   |          requests, errors
+   |
+   ├── Gauge
+   |      └── Current value
+   |          CPU, memory, active users
+   |
+   ├── Histogram
+   |      └── Distribution / buckets
+   |          latency
+   |
+   └── Summary
+          └── Quantiles
+              P50, P95, P99
 
 
+INFRASTRUCTURE
+   ├── CPU
+   ├── Memory
+   ├── Disk
+   └── Network
 
-
-
-
-
-
-
-
-
-
+APPLICATION
+   ├── Request rate
+   ├── Error rate
+   ├── Latency
+   ├── Active users
+   ├── DB connections
+   └── Business metrics
+```
+    
