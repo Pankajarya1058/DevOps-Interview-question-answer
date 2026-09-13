@@ -396,8 +396,70 @@ Fastest                                      Slowest
 
 **Interview one-liner:** P99 latency means 99% of requests complete within that latency, while the slowest 1% take longer.
 
+---
 
+**Metric** = Data representing the system's behavior in numerical form.
+```
+Examples:
 
+CPU usage        = 75%
+Memory usage     = 8 GB
+Requests/sec     = 500
+Error rate       = 2%
+Latency          = 200 ms
+Active users     = 1,000
+```
+
+Tools like Prometheus primarily collect, store, and query these metrics.
+
+## 1. Counter
+- A counter is a metric that normally only increases.
+- Example:
+  ```
+  HTTP requests = 100
+  HTTP requests = 200
+  HTTP requests = 350
+  ```
+- If the application restarts or It might reset when the counter restarts: ```350 -> 0```
+- Real Examples:
+  ```
+  Total HTTP requests
+  Total errors
+  Total login attempts
+  Total orders
+  Total bytes processed
+  ```
+- Prometheus example: ```http_requests_total 12500```
+- Often, just by looking at the _total, you can tell that it's a counter.
+
+**Important interview point**
+- We usually calculate the rate at the counter: ```rate(http_requests_total[5m])```
+- Meaning, What was the average rate of requests per second over the last 5 minutes?
+
+## 2. Gauge
+- The gauge value can either increase or decrease.
+- Example:
+  ```
+  CPU usage:
+  40% → 70% → 55% → 90% → 45%
+
+  Memory usage:
+  4 GB → 6 GB → 5 GB → 8 GB
+  ```
+- Real examples:
+  ```
+  CPU usage
+  Memory usage
+  Temperature
+  Number of active users
+  Number of running processes
+  Queue size
+  ```
+- Prometheus: ```node_memory_available_bytes 4294967296```
+- Gauge = abhi ki current value kya hai?
+  
+
+  
 
 
 
