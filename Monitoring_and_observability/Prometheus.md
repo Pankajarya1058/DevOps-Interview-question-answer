@@ -330,6 +330,164 @@ Prometheus scrapes /metrics
     ) * 100
   )
   ```
-- 
+- Prometheus would have to perform expensive calculations every time.
+- With recording rules, we can pre-calculate and store the results.
+- Example:
+  ```
+  groups:
+  - name: cpu-rules
+    rules:
+      - record: instance:cpu_usage:rate5m
+        expr: |
+          100 - (
+            avg by(instance) (
+              rate(node_cpu_seconds_total{mode="idle"}[5m])
+            ) * 100
+          )
+  ```
+- A new metric will now be available ```instance:cpu_usage:rate5m```
+- Simply in Dashboard ```instance:cpu_usage:rate5m```
+- Interview answer
+  - Recording rules allow us to precompute frequently used or expensive PromQL expressions and store their results as new time series. This improves query performance and simplifies dashboards.
 
+
+**Benefit of Recording Rule**
+```
+Complex Query
+      ↓
+Calculate periodically
+      ↓
+Store result
+      ↓
+Dashboard queries become faster/easier
+```
+
+### 12. Recording Rule vs Alerting Rule
+- Recording rule
+  - Purpose: Metric calculation/precomputation ```record: instance:cpu_usage:rate5m```
+ 
+- Alerting rule
+  - Purpose: Detect problem
+    ```
+    alert: HighCPUUsage
+    expr: cpu_usage > 80
+    for: 5m
+    ```
+- Flow:
+  ```
+  Recording Rule
+      ↓
+  Precomputed metric
+      ↓
+  Alerting Rule
+      ↓
+  Alert
+      ↓
+  Alertmanager
+  ```
+
+### 13. Complete Prometheus Flow
+```
+                    ┌──────────────────┐
+                    │    Application   │
+                    │    /metrics      │
+                    └────────┬─────────┘
+                             │
+                             │ scrape
+                             ↓
+┌──────────────┐      ┌───────────────┐
+│ Node Exporter│─────→│               │
+└──────────────┘      │   Prometheus  │
+                      │               │
+Kubernetes ─────────→ │ Service       │
+Service Discovery     │ Discovery     │
+                      └───────┬───────┘
+                              │
+                     ┌────────┴────────┐
+                     ↓                 ↓
+                  PromQL         Recording Rules
+                     │                 │
+                     ↓                 ↓
+                  Grafana         Alerting Rules
+                                       │
+                                       ↓
+                                  Alertmanager
+                                       │
+                              Slack / Email / etc.
+```
+
+#### One-page memory map
+```
+PROMETHEUS
+│
+├── Architecture
+│     ├── Prometheus Server
+│     ├── TSDB
+│     ├── PromQL
+│     ├── Alerting Rules
+│     └── Recording Rules
+│
+├── Pull Model
+│     └── Prometheus → /metrics
+│
+├── Targets
+│     └── Endpoints to scrape
+│
+├── Exporters
+│     ├── Node Exporter
+│     ├── Blackbox Exporter
+│     └── DB Exporters
+│
+├── Labels
+│     └── Dimensions of metrics
+│
+├── PromQL
+│     ├── filter
+│     ├── rate
+│     ├── aggregation
+│     └── calculations
+│
+├── Service Discovery
+│     ├── Kubernetes
+│     ├── AWS
+│     ├── Consul
+│     └── DNS
+│
+└── Recording Rules
+      └── Precompute expensive queries
+
+```
+
+---
+
+#### Interview Questions
+
+##### Q1. What is Prometheus?
+##### Q2. How does Prometheus work?
+##### Q3. What is a target?
+##### Q4. What is an exporter?
+##### Q5. What is Node Exporter?
+##### Q6. What is PromQL?
+##### Q7. What is a label?
+##### Q8. What is the difference between Grafana and Prometheus?
+##### Q9. Why does Prometheus use a pull model?
+##### Q10. What is service discovery?
+##### Q11. How does Prometheus monitor Kubernetes?
+##### Q12. What is rate()?
+##### Q13. What is the difference between rate() and irate()?
+##### Q14. What is label cardinality?
+##### Q15. What happens if cardinality becomes very high?
+##### Q16. What are recording rules?
+##### Q17. Recording rule vs alerting rule?
+##### Q18. Prometheus is showing target DOWN. How will you troubleshoot?
+##### Q19. Prometheus server memory is increasing. What could be the reason?
+##### Q20. How would you monitor 1,000 Kubernetes pods?
+##### Q21. How would you reduce Prometheus query load?
+##### Q22. How would you handle high-cardinality metrics?
+##### Q23. How would you design Prometheus for a large production environment?
+##### Q24. What happens if Prometheus itself goes down?
+##### Q25. How would you achieve long-term metric storage?
+
+    
+    
   
