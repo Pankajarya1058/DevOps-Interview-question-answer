@@ -179,7 +179,7 @@
 | **GWLB** | Layer 3-ish / network appliance insertion | Firewalls, IDS/IPS, security appliances |
 | **CLB**  | Older Layer 4/7                           | Legacy applications                     |
 
-1. ALB — Application Load Balancer
+**1. ALB — Application Load Balancer**
    - The ALB makes routing decisions by inspecting HTTP/HTTPS requests at the application level.
    - That is why the ALB is called a Layer 7 load balancer.
    ```
@@ -204,7 +204,65 @@
           |                       |
        EC2/ECS                  EC2/ECS
    ```
-   
+**2. NLB — Network Load Balancer**
+   - NLB operate on Layer 4.
+   - Main protocols: ```TCP```, ```UDP```, and ```TLS```
+   - ALB understands HTTP requests, whereas NLB primarily handles traffic based on network-level connection information.
+   ```
+         Client
+           |
+          TCP :443
+           |
+           v
+         +-------+
+         |  NLB  |
+         +---+---+
+           |
+           +------ Server 1
+           |
+           +------ Server 2
+   ```
+   When we use NLB?
+   - Suppose your application is not HTTP-based.
+     ```
+        Client
+         |
+        TCP
+         |
+         v
+        NLB
+         |
+         +---- Application-1
+         |
+         +---- Application-2
+     ```
+     ```
+     Client
+      |
+     UDP
+      |
+      v
+     NLB
+     ```
+**4. GWLB — Gateway Load Balancer**
+- GWLB is used to deploy, scale, and manage virtual network/security appliances such as firewalls and IDS/IPS systems.
+- For example: ```Firewall```, ```IDS```, ```IPS```, ```Deep packet inspection appliance```, and ```Network security appliance```
+  ```
+                  Client
+                    |
+                    v
+                  GWLB
+                    |
+          +---------+---------+
+          |                   |
+          v                   v
+       Firewall-1          Firewall-2
+          |                   |
+          +---------+---------+
+                    |
+                    v
+              Application
+   ```
    
   
     
